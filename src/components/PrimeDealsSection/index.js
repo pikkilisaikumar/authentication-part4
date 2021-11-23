@@ -17,7 +17,8 @@ class PrimeDealsSection extends Component {
 
   getPrimeDeals = async () => {
     const jwtToken = Cookies.get('jwt_token')
-
+    this.setState({apiStatus: 'LOADING'})
+    console.log('Hello')
     const apiUrl = 'https://apis.ccbp.in/prime-deals'
     const options = {
       headers: {
@@ -45,30 +46,46 @@ class PrimeDealsSection extends Component {
     }
   }
 
+  renderPrimeDealsList = () => {
+    const {primeDeals} = this.state
+    return (
+      <div className="products-list-container">
+        <h1 className="primedeals-list-heading">Exclusive Prime Deals</h1>
+        <ul className="products-list">
+          {primeDeals.map(product => (
+            <ProductCard productData={product} key={product.id} />
+          ))}
+        </ul>
+      </div>
+    )
+  }
+
+  renderPrimeDealsFailureView = () => (
+    <img
+      src="https://assets.ccbp.in/frontend/react-js/exclusive-deals-banner-img.png"
+      alt="Register Prime"
+      className="register-prime-image"
+    />
+  )
+
+  renderLoadingView = () => (
+    <div className="products-loader-container">
+      <Loader type="ThreeDots" color="#0b69ff" height="50" width="50" />
+    </div>
+  )
+
   render() {
-    const {apiStatus, primeDeals} = this.state
-    let sai
-    if (apiStatus === 'SUCCESS') {
-      sai = (
-        <div className="products-list-container">
-          <h1 className="primedeals-list-heading">Exclusive Prime Deals</h1>
-          <ul className="products-list">
-            {primeDeals.map(product => (
-              <ProductCard productData={product} key={product.id} />
-            ))}
-          </ul>
-        </div>
-      )
-    } else if (apiStatus === 'Failure') {
-      sai = (
-        <img
-          src="https://assets.ccbp.in/frontend/react-js/exclusive-deals-banner-img.png"
-          alt="Register Prime"
-          className="register-prime-image"
-        />
-      )
+    const {apiStatus} = this.state
+    switch (apiStatus) {
+      case 'SUCCESS':
+        return this.renderPrimeDealsList()
+      case 'FAILURE':
+        return this.renderPrimeDealsFailureView()
+      case 'LOADING':
+        return this.renderLoadingView()
+      default:
+        return null
     }
-    return sai
   }
 }
 
